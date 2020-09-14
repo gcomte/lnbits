@@ -2,14 +2,14 @@ from typing import List, Optional, Union
 
 from lnbits.db import open_ext_db
 
-from .models import PayLink
+from .models import Wallets, Payments
 
 from py_crypto_hd_wallet import HdWallet, HdWalletFactory, HdWalletSaver, HdWalletCoins, HdWalletSpecs
 
 
 ####################Derive address#######################
 
-def get_fresh_address(ex_key=ex_key):
+def get_fresh_address(ex_key: str,):
 
     wallet = get_watch_wallet(wallet_id)
     key_num = wallet[4]

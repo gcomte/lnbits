@@ -9,10 +9,9 @@ def m001_initial(db):
             user TEXT,
             ex_key TEXT NOT NULL,
             description TEXT NOT NULL,
-            amount INTEGER NOT NULL,
             pub_key_no INTEGER NOT NULL
         );
-        """
+    """
     )
 
     db.execute(
@@ -25,5 +24,5 @@ def m001_initial(db):
             amount INTEGER NOT NULL,
             time TIMESTAMP NOT NULL DEFAULT (strftime('%s', 'now'))
         );
-        """
+    """
     )

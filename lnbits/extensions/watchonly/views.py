@@ -7,14 +7,14 @@ from lnbits.extensions.watchonly import watchonly_ext
 from .crud import get_payment
 
 
-@lnurlp_ext.route("/")
+@watchonly_ext.route("/")
 @validate_uuids(["usr"], required=True)
 @check_user_exists()
 def index():
     return render_template("watchonly/index.html", user=g.user)
 
 
-@lnurlp_ext.route("/<payment_id>")
+@watchonly_ext.route("/<payment_id>")
 def display(payment_id):
     link = get_payment(payment_id) or abort(HTTPStatus.NOT_FOUND, "Pay link does not exist.")
 

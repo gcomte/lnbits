@@ -6,7 +6,7 @@ from lnbits.core.crud import get_user
 from lnbits.decorators import api_check_wallet_key, api_validate_post_request
 from lnbits.settings import FORCE_HTTPS
 
-from lnbits.extensions.lnurlp import watchonly_ext
+from lnbits.extensions.watchonly import watchonly_ext
 from .crud import (
     create_watch_wallet,
     get_watch_wallet,
@@ -25,15 +25,18 @@ from .crud import (
 
 @watchonly_ext.route("/api/v1/wallet", methods=["GET"])
 @api_check_wallet_key("invoice")
-def api_wallet_retrieve():
-def api_wallets():
+def api_wallets_retrieve():
 
     try:
         return (
-            jsonify(get_watch_wallets(g.user.id)),
+            jsonify(get_watch_wallets(g.wallet.user)),
             HTTPStatus.OK,
         )
-
+    except:
+        return (
+            jsonify({"message": "Cant fetch."}),
+            HTTPStatus.UPGRADE_REQUIRED,
+        )
 
 @watchonly_ext.route("/api/v1/wallet/<wallet_id>", methods=["GET"])
 @api_check_wallet_key("invoice")
@@ -59,11 +62,11 @@ def api_wallet_retrieve(wallet_id):
 def api_wallet_create_or_update(wallet_id=None):
 
     if not wallet_id:
-        wallet = create_watch_wallet(g.user.id, g.data.ex_key, g.data.description, g.data.amount)
-        return jsonify(get_watch_wallet(wallet)) HTTPStatus.CREATED
+        wallet = create_watch_wallet(g.wallet.user, g.data.ex_key, g.data.description, g.data.amount)
+        return jsonify(get_watch_wallet(wallet)), HTTPStatus.CREATED
 
     else:
-        wallet = update_watch_wallet(wallet_id: str, g.data) 
+        wallet = update_watch_wallet(wallet_id, g.data) 
         return jsonify({wallet}), HTTPStatus.OK 
 
 
@@ -85,15 +88,18 @@ def api_wallet_delete(wallet_id):
 
 @watchonly_ext.route("/api/v1/payment", methods=["GET"])
 @api_check_wallet_key("invoice")
-def api_payment_retrieve():
-def api_payments():
+def api_payments_retrieve():
 
     try:
         return (
-            jsonify(get_payments(g.user.id)),
+            jsonify(get_payments(g.wallet.user)),
             HTTPStatus.OK,
         )
-
+    except:
+        return (
+            jsonify({"message": "Cant fetch."}),
+            HTTPStatus.UPGRADE_REQUIRED,
+        )
 
 @watchonly_ext.route("/api/v1/payment/<payment_id>", methods=["GET"])
 @api_check_wallet_key("invoice")
@@ -119,11 +125,11 @@ def api_payment_retrieve(payment_id):
 def api_payment_create_or_update(payment_id=None):
 
     if not payment_id:
-        payment = create_payment(g.user.id, g.data.ex_key, g.data.pub_key, g.data.amount)
-        return jsonify(get_payment(payment)) HTTPStatus.CREATED
+        payment = create_payment(g.wallet.user, g.data.ex_key, g.data.pub_key, g.data.amount)
+        return jsonify(get_payment(payment)), HTTPStatus.CREATED
 
     else:
-        payment = update_payment(payment_id: str, g.data) 
+        payment = update_payment(payment_id, g.data) 
         return jsonify({payment}), HTTPStatus.OK 
 
 
