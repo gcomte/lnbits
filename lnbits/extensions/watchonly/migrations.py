@@ -21,6 +21,7 @@ def m001_initial(db):
             user TEXT,
             ex_key TEXT NOT NULL,
             pub_key TEXT NOT NULL,
+            time_to_pay INTEGER NOT NULL,
             amount INTEGER NOT NULL,
             time TIMESTAMP NOT NULL DEFAULT (strftime('%s', 'now'))
         );

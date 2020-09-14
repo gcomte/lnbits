@@ -14,5 +14,6 @@ class Payments(NamedTuple):
     user: str
     ex_key: str
     pub_key: str
+    time_to_pay: str
     amount: int
     time: int

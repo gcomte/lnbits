@@ -119,6 +119,7 @@ def api_payment_retrieve(payment_id):
     schema={
         "ex_key": {"type": "string", "empty": False, "required": True},
         "pub_key": {"type": "string", "empty": False, "required": True},
+        "time_to_pay": {"type": "integer", "min": 1, "required": True},
         "amount": {"type": "integer", "min": 1, "required": True},
     }
 )
