@@ -4,12 +4,13 @@ from lnbits.db import open_ext_db
 from lnbits.helpers import urlsafe_short_hash
 
 from .models import atmLink
+import ecdsa
+from hashlib import sha256
 
 
 def create_atm_link(
     *,
     wallet_id: str,
-    title: str,
     amount: int,
     used: int,
 ) -> ATMLink:
@@ -23,17 +24,15 @@ def create_atm_link(
             INSERT INTO atm_link (
                 id,
                 wallet,
-                title,
                 private_key, 
                 amount,
                 used
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?)
             """,
             (
                 link_id,
                 wallet_id,
-                title,
                 private_key,
                 amount,
                 used,
@@ -42,20 +41,15 @@ def create_atm_link(
     return get_atm_link(link_id, 0)
 
 
-def get_atm_link(link_id: str, num=0) -> Optional[ATMLink]:
+def get_atm_link(link_id: str, hash_id=None, num=0) -> Optional[ATMLink]:
     with open_ext_db("atm") as db:
         row = db.fetchone("SELECT * FROM atm_link WHERE id = ?", (link_id,))
+    if hash_id:
+        vk = ecdsa.VerifyingKey.from_string(bytes.fromhex(link_id), curve=ecdsa.SECP256k1, hashfunc=sha256)
+        if not vk.verify(bytes.fromhex(row[3]), hash_id):
+            return None
+
     return ATMLink(**row) if row else None
-
-
-def get_atm_link_by_hash(unique_hash: str, num=0) -> Optional[ATMLink]:
-    with open_ext_db("atm") as db:
-        row = db.fetchone("SELECT * FROM atm_link WHERE unique_hash = ?", (unique_hash,))
-        link = []
-        for item in row:
-            link.append(item)
-    link.append(num)
-    return ATMLink._make(link)
 
 
 def get_atm_links(wallet_ids: Union[str, List[str]]) -> List[ATMLink]:

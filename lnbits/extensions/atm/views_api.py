@@ -4,11 +4,12 @@ from http import HTTPStatus
 from lnurl.exceptions import InvalidUrl as LnurlInvalidUrl
 import shortuuid  # type: ignore
 
+
 from lnbits.core.crud import get_user
 from lnbits.core.services import pay_invoice
 from lnbits.decorators import api_check_wallet_key, api_validate_post_request
 
-from lnbits.extensions.withdraw import withdraw_ext
+from lnbits.extensions.withdraw import atm_ext
 from .crud import (
     create_withdraw_link,
     get_withdraw_link,
@@ -19,7 +20,7 @@ from .crud import (
 )
 
 
-@withdraw_ext.route("/api/v1/links", methods=["GET"])
+@atm_ext.route("/api/v1/links", methods=["GET"])
 @api_check_wallet_key("invoice")
 async def api_links():
     wallet_ids = [g.wallet.id]
@@ -38,7 +39,7 @@ async def api_links():
         )
 
 
-@withdraw_ext.route("/api/v1/links/<link_id>", methods=["GET"])
+@atm_ext.route("/api/v1/links/<link_id>", methods=["GET"])
 @api_check_wallet_key("invoice")
 async def api_link_retrieve(link_id):
     link = get_withdraw_link(link_id, 0)
@@ -52,8 +53,8 @@ async def api_link_retrieve(link_id):
     return jsonify({**link._asdict(), **{"lnurl": link.lnurl}}), HTTPStatus.OK
 
 
-@withdraw_ext.route("/api/v1/links", methods=["POST"])
-@withdraw_ext.route("/api/v1/links/<link_id>", methods=["PUT"])
+@atm_ext.route("/api/v1/links", methods=["POST"])
+@atm_ext.route("/api/v1/links/<link_id>", methods=["PUT"])
 @api_check_wallet_key("admin")
 @api_validate_post_request(
     schema={
@@ -93,7 +94,7 @@ async def api_link_create_or_update(link_id=None):
     return jsonify({**link._asdict(), **{"lnurl": link.lnurl}}), HTTPStatus.OK if link_id else HTTPStatus.CREATED
 
 
-@withdraw_ext.route("/api/v1/links/<link_id>", methods=["DELETE"])
+@atm_ext.route("/api/v1/links/<link_id>", methods=["DELETE"])
 @api_check_wallet_key("admin")
 async def api_link_delete(link_id):
     link = get_withdraw_link(link_id)
@@ -112,7 +113,7 @@ async def api_link_delete(link_id):
 # FOR LNURLs WHICH ARE NOT UNIQUE
 
 
-@withdraw_ext.route("/api/v1/lnurl/<unique_hash>", methods=["GET"])
+@atm_ext.route("/api/v1/lnurl/<unique_hash>", methods=["GET"])
 async def api_lnurl_response(unique_hash):
     link = get_withdraw_link_by_hash(unique_hash)
 
@@ -133,7 +134,7 @@ async def api_lnurl_response(unique_hash):
 # FOR LNURLs WHICH ARE UNIQUE
 
 
-@withdraw_ext.route("/api/v1/lnurl/<unique_hash>/<id_unique_hash>", methods=["GET"])
+@atm_ext.route("/api/v1/lnurl/<unique_hash>/<id_unique_hash>", methods=["GET"])
 async def api_lnurl_multi_response(unique_hash, id_unique_hash):
     link = get_withdraw_link_by_hash(unique_hash)
 
@@ -160,7 +161,7 @@ async def api_lnurl_multi_response(unique_hash, id_unique_hash):
     return jsonify(link.lnurl_response.dict()), HTTPStatus.OK
 
 
-@withdraw_ext.route("/api/v1/lnurl/cb/<unique_hash>", methods=["GET"])
+@atm_ext.route("/api/v1/lnurl/cb/<unique_hash>", methods=["GET"])
 async def api_lnurl_callback(unique_hash):
     link = get_withdraw_link_by_hash(unique_hash)
     k1 = request.args.get("k1", type=str)

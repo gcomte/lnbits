@@ -3,11 +3,10 @@ from http import HTTPStatus
 
 from lnbits.decorators import check_user_exists, validate_uuids
 
-from lnbits.extensions.withdraw import withdraw_ext
-from .crud import get_withdraw_link, chunks
+from lnbits.extensions.atm import atm_ext
 
 
-@withdraw_ext.route("/")
+@atm_ext.route("/")
 @validate_uuids(["usr"], required=True)
 @check_user_exists()
 async def index():
