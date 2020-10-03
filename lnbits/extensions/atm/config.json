@@ -1,0 +1,6 @@
+{
+  "name": "ATM links",
+  "short_description": "Offline withdraw links",
+  "icon": "atm",
+  "contributors": ["arcbtc"]
+}
